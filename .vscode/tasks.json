@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Docker Postgres",
+      "dependsOn": [
+        "Remove Docker Postgres",
+        "Start Docker Postgres Container",
+        "Sleep for 10 seconds",
+        "Prisma migrate deploy",
+        "Prisma seed"
+      ],
+      "dependsOrder": "sequence",
+    },
+    {
+      "label": "Remove Docker Postgres",
+      "type": "shell",
+      "command": "docker rm -vf balance-postgres",
+    },
+    {
+      "label": "Start Docker Postgres Container",
+      "type": "shell",
+      "command": "docker run --name balance-postgres -p 6000:5432 -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_DB=dockerdatabase -d postgres:16.4",
+    },
+    {
+      "label": "Sleep for 10 seconds",
+      "type": "shell",
+      // "command": "ping -c 5 127.0.0.1"
+      "command": "ping 127.0.0.1 -n 5" // for windows
+    },
+    {
+      "label": "Prisma migrate deploy",
+      "type": "shell",
+      "command": "npx prisma migrate deploy",
+      "options": {
+        "env": {
+          "DATABASE_URL": "postgresql://postgres:mysecretpassword@localhost:6000/dockerdatabase?schema=test"
+        }
+      },
+    },
+    {
+      "label": "Prisma seed",
+      "type": "shell",
+      "command": "npx prisma db seed",
+      "options": {
+        "env": {
+          "DATABASE_URL": "postgresql://postgres:mysecretpassword@localhost:6000/dockerdatabase?schema=test"
+        }
+      },
+    },
+    {
+      "label": "Destroy Docker Postgres",
+      "type": "shell",
+      "command": "docker rm -vf balance-postgres",
+    }
+  ]
+}

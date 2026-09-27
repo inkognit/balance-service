@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:16.4
+    container_name: balance-postgres
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: dockerdatabase
+    ports:
+      - '6000:5432'

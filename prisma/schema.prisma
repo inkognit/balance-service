@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  balance      Int           @default(0)
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model Transaction {
+  id     Int      @id @default(autoincrement())
+  userId Int      @map("user_id")
+  action Action
+  amount Int
+  ts     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, ts])
+  @@map("transactions")
+}
+
+enum Action {
+  DEBIT
+  CREDIT
+}
